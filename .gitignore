@@ -1,0 +1,6 @@
+local.py
+*__pycache__/
+PRG1/
+.idea
+*sqlite3
+.env
