@@ -18,7 +18,7 @@ from django.urls import path
 
 from rest_framework import routers
 
-from api.views import FlatViewSet, RentingViewSet,RatingViewSet
+from api.views import FlatViewSet, RentingViewSet, RatingViewSet
 
 router = routers.DefaultRouter()
 

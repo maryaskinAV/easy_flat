@@ -9,3 +9,4 @@ class RentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Renting
         fields = ['flat','count_guest','lease_duration']
+        read_only_fields = ['flat']

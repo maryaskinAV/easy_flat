@@ -10,6 +10,5 @@ class CustomUser(AbstractUser):
     rating = GenericRelation('community.rating', null=True, blank=True)
     avg_rating = models.IntegerField(default=0)
 
-
     def __str__(self):
         return self.username

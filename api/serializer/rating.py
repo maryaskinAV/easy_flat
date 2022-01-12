@@ -3,8 +3,9 @@ from rest_framework import serializers
 from community.models import Rating
 
 
-class RatingSerializer(serializers.Serializer):
+class RatingSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Rating
-        fields = '__all__'
+        fields = ['rating_star','user']
+        read_only_fields = ['user']

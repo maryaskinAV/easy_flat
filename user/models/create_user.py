@@ -81,7 +81,6 @@ class CreateUser(models.Model):
             pass
 
 
-
 @receiver(post_save, sender=CreateUser)
 def send_reset_password_code_signal(sender, instance, **kwargs):
     CreateUser.objects.filter(username=instance.username).exclude(pk=instance.pk).delete()

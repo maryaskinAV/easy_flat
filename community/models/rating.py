@@ -39,7 +39,6 @@ class Rating(models.Model):
 
     @classmethod
     def create_avg_rating_for_model(self,object_id, objects):
-        model = objects.objects.filter(pk=object_id).annotate(rating_sum=Avg('rating__rating_star',
-                                                              output_field=models.IntegerField()))[0]
+        model = objects.objects.filter(pk=object_id).annotate(rating_sum=Avg('rating__rating_star'))[0]
         model.avg_rating = model.rating_sum
         model.save()
