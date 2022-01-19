@@ -1,8 +1,14 @@
 from django.db import models
+from django.db.models import Avg
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
-from django.db.models import Avg
+
+import typing
+
+if not typing.TYPE_CHECKING:
+    from user.models import CustomUser
 
 
 class Rating(models.Model):
@@ -24,21 +30,27 @@ class Rating(models.Model):
 
     rating_star = models.IntegerField(choices=RatingStar.choices)
 
-    @classmethod
-    def create_rating(self, object_id, rating_star, objects, user):
-        object = get_object_or_404(objects, pk=object_id)
-        object_type = ContentType.objects.get_for_model(object)
-        try:
-            Rating.objects.get(content_type__pk=object_type.id, object_id=object_id,
-                               user=user)
-            raise ValidationError('you have already taken a rating')
-        except Rating.DoesNotExist:
-            Rating.objects.create(user=user, rating_star=rating_star,
-                              content_object=object, object_id=object_id)
-        self.create_avg_rating_for_model(object_id,objects)
+    def save(self):
+        self.clean()
+        model_name = ContentType.objects.get(id=self.content_type.id).model_class()
+        super().save()
+        self.update_avg_rating_for_parent(self.object_id, model_name)
 
-    @classmethod
-    def create_avg_rating_for_model(self,object_id, objects):
-        model = objects.objects.filter(pk=object_id).annotate(rating_sum=Avg('rating__rating_star'))[0]
+    def delete(self):
+        model_name = ContentType.objects.get(id=self.content_type.id).model_class()
+        super().delete()
+        self.update_avg_rating_for_parent(self.object_id, model_name)
+
+    def clean(self):
+        model_name = ContentType.objects.get(id=self.content_type.id).model_class()
+        object_exist = get_object_or_404(model_name, pk=self.object_id)
+        super().clean()
+        if Rating.objects.filter(content_type__pk=self.content_type.id,
+                                 object_id=self.object_id, user=self.user).exists():
+            raise ValidationError('you have already taken a rating')
+
+    @staticmethod
+    def update_avg_rating_for_parent(object_id, model_name: models.Model):
+        model = model_name.objects.filter(pk=object_id).annotate(rating_sum=Avg('rating__rating_star')).first()
         model.avg_rating = model.rating_sum
         model.save()

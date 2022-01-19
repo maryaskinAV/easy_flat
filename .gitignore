@@ -4,3 +4,4 @@ PRG1/
 .idea
 *sqlite3
 .env
+*.idea

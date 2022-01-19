@@ -15,10 +15,12 @@ import datetime
 import rest_framework_jwt
 import os
 import environ
+
 BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
 env_file = os.path.join(os.path.dirname(Path(__file__).resolve(strict=True).parent), '.env')
 env = environ.Env()
 environ.Env.read_env(env_file=env_file)
+
 def get_env_value(name: str, default: any = None):
     return env(name, default=None) or os.environ.get(name) or default
 
@@ -94,7 +96,7 @@ DATABASES = {
         'USER': get_env_value('USER_DB',default='USER_DB'),
         'PASSWORD': get_env_value('PASSWORD_DB',default='PASSWORD_DB'),
         'HOST': get_env_value('HOST_DB',default='127.0.0.1'),
-        'PORT': get_env_value('PORT_DB',default=5432)
+        'PORT': get_env_value('PORT_DB',default=5432),
     }
 }
 

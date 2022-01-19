@@ -4,7 +4,8 @@ from .base_enum import BaseEnum
 
 
 class ArenaTimeLine(BaseEnum):
-
+    """
+    Выбор краткосрочной или долгосрочной аренды
+    """
     OneDay = _('OneDay')
     LongTime = _('LongTime')
-    Any = _('')

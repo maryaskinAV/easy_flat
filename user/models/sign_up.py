@@ -10,20 +10,23 @@ from django.dispatch import receiver
 from django.utils.timezone import now,timedelta
 from django.core.mail import send_mail
 from django.core.exceptions import ValidationError
+from django.core.exceptions import ObjectDoesNotExist
+
 from rest_framework_jwt.settings import api_settings
 
-from django.core.exceptions import ObjectDoesNotExist
 from user.tasks import send_create_user_code
-
 from user.models import CustomUser
-
+from user.service import create_token
 
 class CreateUserManager(models.Manager):
     def get_for_activating(self):
         return super().get_queryset().filter(activated=False)
 
 
-class CreateUser(models.Model):
+class SignUpOrder(models.Model):
+    """
+    Модель заявки на регистрацию пользователя
+    """
     email = models.EmailField()
     sent_at = models.DateTimeField(default=now)
     uuid = models.UUIDField(default=uuid.uuid4, unique=True)
@@ -45,8 +48,8 @@ class CreateUser(models.Model):
 
     def send_email(self):
         title = 'Easy Flat - activation code'
-        activation_frontend_url = '{}{}/{}/activation/'.format(settings.FRONTEND_URL, 'user/create_user', self.uuid)
-        text = 'Your url for create account - {}'.format(activation_frontend_url)
+        activation_url = f'{settings.FRONTEND_URL}user/create_user/{self.uuid}/activation/'
+        text = f'Your url for create account - {activation_url}'
         response = send_mail(
             title,
             text,
@@ -58,32 +61,32 @@ class CreateUser(models.Model):
 
     @atomic
     def activate(self):
-        self.clean()
         self.activated = True
         self.save()
-        jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
-        jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
         user = CustomUser.objects.create_user(username=self.username,
                                               password=self.password,
                                               email=self.email)
-        payload = jwt_payload_handler(user)
-        token = jwt_encode_handler(payload)
-        data = {'token': token}
-        return data
+        token = create_token(user)
+        return token
 
     def clean(self):
+        """
+        Токен действует не более 10 минут. При просроченном токене регистрация невозможна
+        """
         if self.sent_at + timedelta(minutes=10) < now():
+            # todo Сделать файл messages.py для текстов: КУДА КИДАТЬ ФАЙЛ??
             raise ValidationError('Your token was expired')
-        try:
-            CustomUser.objects.get(email=self.email)
+        if CustomUser.objects.filter(email=self.email).exists():
             raise ValidationError('Your email have already busy')
-        except ObjectDoesNotExist:
-            pass
 
+    def save(self, *args, **kwargs):
+        self.clean()
+        super().save(*args, **kwargs)
 
-@receiver(post_save, sender=CreateUser)
+#todo Расставить тайпинги ВИЗДЕ ВИЗДЕ
+@receiver(post_save, sender=SignUpOrder)
 def send_reset_password_code_signal(sender, instance, **kwargs):
-    CreateUser.objects.filter(username=instance.username).exclude(pk=instance.pk).delete()
+    SignUpOrder.objects.filter(username=instance.username).exclude(pk=instance.pk).delete()
     if instance.activated:
         title = 'Easy Flat - activation success'
         text = 'Your account was activated'

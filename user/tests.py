@@ -3,7 +3,7 @@ from django.test import TestCase
 from django.shortcuts import reverse
 from unittest.mock import patch
 
-from user.models import CreateUser, CustomUser, PasswordChangeOrder
+from user.models import SignUpOrder, CustomUser, PasswordChangeOrder
 from user.tasks import send_create_user_code,send_reset_password_code
 
 
@@ -22,6 +22,7 @@ class BaseTestCase(TestCase):
                                                is_active=True, is_staff=True, is_superuser=False)
         self.quest.set_password(self.first_password)
         self.quest.save()
+
 
 class MockSMTP_SSL:
     '''
@@ -62,8 +63,7 @@ class UserTestCase(BaseTestCase):
     @patch('smtplib.SMTP_SSL')
     def test_create_user(self, smtp_mock):
         smtp_mock.return_value.__enter__.return_value = MockSMTPSSLSuccess()
-
-        order = CreateUser.objects.create(username=self.admin_user, uuid='cdfab639-fb06-43d8-a09d-1f3452f1b08d',email='example@gmail.com')
+        order = SignUpOrder.objects.create(username=self.admin_user, uuid='cdfab639-fb06-43d8-a09d-1f3452f1b08d', email='example@gmail.com')
         send_create_user_code(order.id)
         order.refresh_from_db()
         self.assertIsNotNone(order.sent_at)
@@ -76,3 +76,10 @@ class UserTestCase(BaseTestCase):
         send_reset_password_code(order.id)
         order.refresh_from_db()
         self.assertIsNotNone(order.sent_at)
+"""
+Приоритеты: 
+1. ТО что может сломаться (платежка,деньги)
+2. Корневые функции 
+3. 
+"""
+#todo покрыть тестами создание модели

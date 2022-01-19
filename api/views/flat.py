@@ -9,6 +9,12 @@ from flat.models import Flat
 
 
 class FlatViewSet(ModelViewSet):
+    """
+    ViewSet для работы с Flat объектами.
+    При создани модели пользователь является отправителем заявки при помощи переопределения
+    метода perform_create()
+    Также ViewSet поддерживает фильтрацию по множеству парамтров при помощи FlatFilter
+    """
     queryset = Flat.objects.all()
     serializer_class = FlatSerializer
     permission_classes = [OwnerOrReadOnly]

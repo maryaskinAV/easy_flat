@@ -34,6 +34,8 @@ class FlatFilter(filter.FilterSet):
         Принимает начальную дату и конечную для выявления
         свободных квартир в этот промежуток времени
         """
+        # booked_days принимает начало и конец аренды в формате
+        # Пример:{"upper":"2012-12-1","lower":2012-12-2}
         ranges = DateRange(value[0], value[1])
         if value[0] > value[1]:
             raise ValidationError('День снятия позже даты сдачи')
@@ -42,7 +44,7 @@ class FlatFilter(filter.FilterSet):
 
     class Meta:
         model = Flat
-        fields = ['cost', 'rooms_count', 'total_area', 'max_guest', 'arena_timeline','booked_days']
+        fields = ['cost', 'rooms_count', 'total_area', 'max_guest', 'arena_timeline', 'booked_days']
 
 
 

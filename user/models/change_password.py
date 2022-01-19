@@ -18,6 +18,9 @@ class PasswordChangeOrderManager(models.Manager):
 
 
 class PasswordChangeOrder(models.Model):
+    """
+    Модель заявки на спену пародя пользователя
+    """
     user = models.ForeignKey('CustomUser', on_delete=models.CASCADE)
     password = models.CharField(max_length=16)
     uuid = models.UUIDField(default=uuid.uuid4, unique=True)

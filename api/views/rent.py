@@ -8,7 +8,6 @@ from api.permissions import OwnerOrReadOnly
 
 
 class RentingViewSet(ModelViewSet):
-
     """
     Viweset для создания бронировки квартиры и показа всех личных бронировок пользователю
     """
@@ -20,5 +19,6 @@ class RentingViewSet(ModelViewSet):
         serializer.save(user=self.request.user)
 
     def get_queryset(self):
+        # При получении бронировок квартир пользователь получит только сои бронировки
         queryset = Renting.objects.filter(user=self.request.user)
         return queryset
