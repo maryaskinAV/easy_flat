@@ -19,6 +19,6 @@ class RentingViewSet(ModelViewSet):
         serializer.save(user=self.request.user)
 
     def get_queryset(self):
-        # При получении бронировок квартир пользователь получит только сои бронировки
+        # При получении бронировок квартир пользователь получит только свои бронировки
         queryset = Renting.objects.filter(user=self.request.user)
         return queryset

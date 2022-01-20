@@ -5,7 +5,7 @@ from unittest.mock import patch
 
 from user.models import SignUpOrder, CustomUser, PasswordChangeOrder
 from user.tasks import send_create_user_code,send_reset_password_code
-
+from user.service import create_token
 
 class BaseTestCase(TestCase):
     first_password = '123'
@@ -76,6 +76,10 @@ class UserTestCase(BaseTestCase):
         send_reset_password_code(order.id)
         order.refresh_from_db()
         self.assertIsNotNone(order.sent_at)
+
+    def test_create_token(self):
+        token = create_token(self.admin_user)
+
 """
 Приоритеты: 
 1. ТО что может сломаться (платежка,деньги)
