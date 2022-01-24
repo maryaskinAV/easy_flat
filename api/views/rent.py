@@ -47,10 +47,6 @@ class RentingViewSet(ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
-    # todo как правильно обустроить все запросы
-    # 1 запрос для пользователя для получения его бронировок
-    # 2 запрос получания бронировок по квартире(для условной панели хозяина квартиры
-    # с возможностью выбрать промежуток)
     def get_queryset(self):
         # При получении бронировок квартир пользователь получит только свои бронировки
         queryset = Renting.objects.filter(user=self.request.user)

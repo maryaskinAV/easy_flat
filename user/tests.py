@@ -79,11 +79,3 @@ class UserTestCase(BaseTestCase):
 
     def test_create_token(self):
         token = create_token(self.admin_user)
-
-"""
-Приоритеты: 
-1. ТО что может сломаться (платежка,деньги)
-2. Корневые функции 
-3. 
-"""
-#todo покрыть тестами создание модели

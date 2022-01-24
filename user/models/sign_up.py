@@ -74,7 +74,7 @@ class SignUpOrder(models.Model):
         Токен действует не более 10 минут. При просроченном токене регистрация невозможна
         """
         if self.sent_at + timedelta(minutes=10) < now():
-            # todo Сделать файл messages.py для текстов: КУДА КИДАТЬ ФАЙЛ??
+
             raise ValidationError('Your token was expired')
         if CustomUser.objects.filter(email=self.email).exists():
             raise ValidationError('Your email have already busy')
@@ -83,7 +83,7 @@ class SignUpOrder(models.Model):
         self.clean()
         super().save(*args, **kwargs)
 
-#todo Расставить тайпинги ВИЗДЕ ВИЗДЕ
+
 @receiver(post_save, sender=SignUpOrder)
 def send_reset_password_code_signal(sender, instance, **kwargs):
     SignUpOrder.objects.filter(username=instance.username).exclude(pk=instance.pk).delete()
