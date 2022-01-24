@@ -1,11 +1,11 @@
 from django.test import TestCase
 
-from django.shortcuts import reverse
 from unittest.mock import patch
 
 from user.models import SignUpOrder, CustomUser, PasswordChangeOrder
 from user.tasks import send_create_user_code,send_reset_password_code
 from user.service import create_token
+
 
 class BaseTestCase(TestCase):
     first_password = '123'

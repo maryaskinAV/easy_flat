@@ -1,20 +1,53 @@
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.viewsets import GenericViewSet
+from rest_framework import mixins
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.contrib.contenttypes.models import ContentType
 
+from django.utils.decorators import method_decorator
+from drf_yasg.utils import swagger_auto_schema
+
 from api.serializer import RatingSerializer
 from api.permissions import OwnerOrReadOnly
 from community.models import Rating
-from flat.models import Flat
-from user.models import CustomUser
+
+tags = ['api/rating']
 
 
-class RatingViewSet(ModelViewSet):
+@method_decorator(swagger_auto_schema(operation_id='List of rating',
+                                      tags=tags,
+                                      operation_description='Выдача рейтинга происходит'
+                                                            ' по конкретному объекту',
+                                      responses={}), name='list')
+@method_decorator(swagger_auto_schema(operation_id='Retrieve the rating',
+                                      tags=tags,
+                                      operation_description='',
+                                      responses={}), name='retrieve')
+@method_decorator(swagger_auto_schema(operation_id='Update rating',
+                                      tags=tags,
+                                      operation_description='',
+                                      responses={}), name='update')
+@method_decorator(swagger_auto_schema(operation_id='Partial update rating',
+                                      tags=tags,
+                                      operation_description='',
+                                      responses={}), name='partial_update')
+@method_decorator(swagger_auto_schema(operation_id='Delete rating',
+                                      tags=tags,
+                                      operation_description='',
+                                      responses={}), name='destroy')
+class RatingViewSet(mixins.RetrieveModelMixin,
+                    mixins.UpdateModelMixin,
+                    mixins.DestroyModelMixin,
+                    mixins.ListModelMixin,
+                    GenericViewSet):
     queryset = Rating.objects.all()
     serializer_class = RatingSerializer
     permission_classes = [OwnerOrReadOnly]
 
+    @method_decorator(swagger_auto_schema(operation_id='Create rating',
+                                          tags=tags,
+                                          operation_description='',
+                                          responses={}), name='Create rating')
     @action(detail=False, methods=['POST'], url_path='create_rating')
     def create_rating(self, request, *args, **kwargs):
         object_id = request.data['object_id']

@@ -6,7 +6,7 @@ class RentSerializer(serializers.ModelSerializer):
     """
     Сериализатор сущности аренды
     """
+
     class Meta:
         model = Renting
-        fields = ['flat','count_guest','lease_duration']
-        read_only_fields = ['flat']
+        fields = ['flat', 'count_guest', 'lease_duration']

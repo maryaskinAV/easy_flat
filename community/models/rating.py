@@ -1,7 +1,9 @@
 from django.db import models
 from django.db.models import Avg
+
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+
 from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
 
@@ -33,9 +35,9 @@ class Rating(models.Model):
 
     rating_star = models.IntegerField(choices=RatingStar.choices)
 
-    def save(self):
+    def save(self,*args,**kwargs):
         self.clean()
-        super().save()
+        super().save(*args,**kwargs)
 
     def clean(self):
         model_name = ContentType.objects.get(id=self.content_type.id).model_class()
