@@ -15,18 +15,18 @@ class RentingTestCase(ApiTestCase):
                                               lease_duration=DateRange(lower='2012-11-01', upper='2012-11-10',
                                                                        bounds='[)'))
 
-    def test_renting_create(self):
+    def test_renting_post(self):
         url = reverse('rent-list')
-        self.authorize()
+        self.authorize(self.admin_user)
         data = {'flat': self.flat.id, 'user': self.admin_user,
                 'count_guest': 31, 'lease_duration': json.dumps({'upper': '2012-12-01',
                                                                  'lower': '2012-11-10', 'bounds': '[)'})}
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, 201)
 
-    def test_renting_edit(self):
+    def test_renting_patch(self):
         url = reverse('rent-detail', args=(self.renting.id,))
-        self.authorize()
+        self.authorize(self.admin_user)
         data = {'count_guest': 22, 'lease_duration': json.dumps({'upper': '2012-12-01',
                                                                  'lower': '2012-11-10', 'bounds': '[)'})}
         response = self.client.patch(url, data=data)
@@ -34,19 +34,19 @@ class RentingTestCase(ApiTestCase):
 
     def test_renting_delete(self):
         url = reverse('rent-detail', args=(self.renting.id,))
-        self.authorize()
+        self.authorize(self.admin_user)
         response = self.client.delete(url)
         self.assertEqual(response.status_code, 204)
         self.assertFalse(Renting.objects.filter(id=self.renting.id).exists())
 
     def test_renting_get(self):
         url = reverse('rent-detail', args=(self.renting.id,))
-        self.authorize()
+        self.authorize(self.admin_user)
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
-    def test_flat_list(self):
+    def test_renting_list(self):
         url = reverse('rent-list')
-        self.authorize()
+        self.authorize(self.admin_user)
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)

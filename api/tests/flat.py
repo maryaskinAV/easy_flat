@@ -8,11 +8,11 @@ class FlatTestCase(ApiTestCase):
     def setUp(self):
         super().setUp()
 
-    def test_flat_create(self):
+    def test_flat_post(self):
         url = reverse('flat-list')
         data = {'rooms_count': 3, 'cost': 2332, 'max_guest': 32,
                 'arena_timeline': 'OneDay', 'total_area': 23}
-        self.authorize()
+        self.authorize(self.admin_user)
         response = self.client.post(url, data=data)
         self.assertEqual(response.status_code, 201)
 
@@ -35,17 +35,17 @@ class FlatTestCase(ApiTestCase):
         response = self.client.get(url + params)
         self.assertEqual(response.status_code, 200)
 
-    def test_flat_edit(self):
+    def test_flat_patch(self):
         url = reverse('flat-detail', args=(self.flat.id,))
         data = {'rooms_count': 3422, 'cost': 54353, 'max_guest': 3122,
                 'arena_timeline': 'OneDay', 'total_area': 2432}
-        self.authorize()
+        self.authorize(self.admin_user)
         response = self.client.patch(url, data=data)
         self.assertEqual(response.status_code, 200)
 
     def test_flat_delete(self):
         url = reverse('flat-detail', args=(self.flat.id,))
-        self.authorize()
+        self.authorize(self.admin_user)
         response = self.client.delete(url)
         self.assertEqual(response.status_code, 204)
         self.assertFalse(Flat.objects.filter(id=self.flat.id).exists())

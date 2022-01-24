@@ -1,3 +1,5 @@
+from pprint import pprint
+
 from django.db import models
 from django.db.models import Avg
 
@@ -26,7 +28,6 @@ class Rating(models.Model):
     user = models.ForeignKey('user.CustomUser', on_delete=models.CASCADE, null=True)
 
     class RatingStar(models.IntegerChoices):
-
         One = 1
         Two = 2
         Free = 3
@@ -35,16 +36,16 @@ class Rating(models.Model):
 
     rating_star = models.IntegerField(choices=RatingStar.choices)
 
-    def save(self,*args,**kwargs):
+    def save(self, *args, **kwargs):
         self.clean()
-        super().save(*args,**kwargs)
+        super().save(*args, **kwargs)
 
     def clean(self):
         model_name = ContentType.objects.get(id=self.content_type.id).model_class()
         object_exist = get_object_or_404(model_name, pk=self.object_id)
         super().clean()
         if Rating.objects.filter(content_type__pk=self.content_type.id,
-                                 object_id=self.object_id, user=self.user).exists():
+                                 object_id=self.object_id, user=self.user).exists() and self.id is None:
             raise ValidationError('you have already taken a rating')
 
 

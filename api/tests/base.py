@@ -13,6 +13,6 @@ class ApiTestCase(APITestCase, BaseTestCase):
                                         max_guest=32, arena_timeline='OneDay',
                                         total_area=23, owner=self.admin_user)
 
-    def authorize(self):
-        token = create_token(self.admin_user)
+    def authorize(self,user):
+        token = create_token(user)
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token['token'])
