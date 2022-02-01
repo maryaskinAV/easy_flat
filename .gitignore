@@ -5,3 +5,4 @@ PRG1/
 *sqlite3
 .env
 *.idea
+.travis.yml
