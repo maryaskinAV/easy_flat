@@ -3,7 +3,7 @@ from flat.models import Renting
 
 from django.utils.decorators import method_decorator
 from drf_yasg.utils import swagger_auto_schema
-
+from drf_yasg import openapi
 from api.serializer import RentSerializer
 from api.permissions import OwnerOrReadOnly
 
@@ -35,7 +35,9 @@ tags = ['api/rent']
                                       tags=tags,
                                       operation_description='Бронировку может сделать '
                                                             'только авторизованный пользователь',
-                                      responses={}), name='create')
+                                      responses={}, manual_parameters=[
+        openapi.Parameter('lease_duration', openapi.IN_QUERY,description="{'upper':'YYYY-MM-DD','lower':'YYYY-MM-DD'}",type="date")]),
+                  name='create')
 class RentingViewSet(ModelViewSet):
     """
     Viweset для создания бронировки квартиры и показа всех личных бронировок пользователю

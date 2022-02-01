@@ -3,7 +3,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 from django.utils.decorators import method_decorator
 from drf_yasg.utils import swagger_auto_schema
-
+from drf_yasg import openapi
 from api.filters import FlatFilter
 from api.serializer import FlatSerializer
 from api.permissions import OwnerOrReadOnly
@@ -17,7 +17,7 @@ tags = ['api/flat']
                                       tags=tags,
                                       operation_description='ViewSet поддерживает фильтрацию по множеству '
                                                             'парамтров при помощи FlatFilter',
-                                      responses={}), name='list')
+                                      responses={},manual_parameters=[openapi.Parameter('booked_days', openapi.IN_QUERY, type="{'upper':'YYYY-MM-DD','lower':'YYYY-MM-DD'}")]), name='list')
 @method_decorator(swagger_auto_schema(operation_id='Retrieve the flat',
                                       tags=tags,
                                       operation_description='',
