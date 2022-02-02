@@ -1,4 +1,5 @@
 import uuid
+import traceback
 
 from django.db import models
 from django.conf import settings
@@ -9,8 +10,8 @@ from django.dispatch import receiver
 from django.core.mail import send_mail
 from django.core.exceptions import ValidationError
 from rest_framework_jwt.settings import api_settings
-
 from user.tasks import send_reset_password_code
+
 
 class PasswordChangeOrderManager(models.Manager):
     def get_for_activating(self):
@@ -70,9 +71,8 @@ class PasswordChangeOrder(models.Model):
             raise ValidationError('Your token was expired')
 
 
-
 @receiver(post_save, sender=PasswordChangeOrder)
-def send_reset_password_code_signal(sender, instance, **kwargs):
+def send_reset_password_code_signal(sender, instance: PasswordChangeOrder, **kwargs):
     PasswordChangeOrder.objects.filter(user=instance.user).exclude(pk=instance.pk).delete()
     if instance.activated:
         title = 'Easy Flat - activation success'

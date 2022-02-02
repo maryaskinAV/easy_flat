@@ -1,5 +1,3 @@
-from pprint import pprint
-
 from django.db import models
 from django.db.models import Avg
 
@@ -51,7 +49,7 @@ class Rating(models.Model):
 
 @receiver(post_delete, sender=Rating)
 @receiver(post_save, sender=Rating)
-def update_avg_rating_for_parent(sender, instance, **kwargs):
+def update_avg_rating_for_parent(sender: Rating, instance: Rating, **kwargs):
     model_name = ContentType.objects.get(id=instance.content_type.id).model_class()
     model = model_name.objects.filter(pk=instance.object_id).annotate(rating_sum=Avg('rating__rating_star')).first()
     model.avg_rating = model.rating_sum

@@ -1,4 +1,3 @@
-from rest_framework.viewsets import ModelViewSet
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.mixins import CreateModelMixin
 from rest_framework.decorators import action
@@ -16,7 +15,7 @@ class CreateUserViewSet(GenericViewSet,CreateModelMixin):
     lookup_field = 'uuid'
 
     @action(detail=True, methods=['POST'], url_path='activation')
-    def activation(self, request,uuid, *args, **kwargs):
+    def activation(self, request,uuid:str, *args, **kwargs):
         order = self.get_object()
         data = order.activate()
         return Response(data)

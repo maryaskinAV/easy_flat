@@ -85,7 +85,7 @@ class SignUpOrder(models.Model):
 
 
 @receiver(post_save, sender=SignUpOrder)
-def send_reset_password_code_signal(sender, instance, **kwargs):
+def send_reset_password_code_signal(sender, instance:SignUpOrder, **kwargs):
     SignUpOrder.objects.filter(username=instance.username).exclude(pk=instance.pk).delete()
     if instance.activated:
         title = 'Easy Flat - activation success'

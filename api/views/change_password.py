@@ -2,7 +2,6 @@ from rest_framework.mixins import CreateModelMixin
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
 
 from api.serializer import PasswordChangeOrderSerializer
 from user.models import PasswordChangeOrder
@@ -22,7 +21,7 @@ class PasswordChangeOrderViewSet(GenericViewSet,CreateModelMixin):
         serializer.save(user=self.request.user)
 
     @action(detail=True, methods=['POST'], url_path='activation')
-    def activation(self, request,uuid, *args, **kwargs):
+    def activation(self, request,uuid:str, *args, **kwargs):
         order = self.get_object()
         data = order.activate()
         return Response(data)
