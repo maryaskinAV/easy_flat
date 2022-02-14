@@ -1,19 +1,14 @@
-from django_filters.filters import RangeField
-from django import forms
-from django_filters.rest_framework import RangeFilter
+import typing
+
+from django_filters.filters import DateRangeField, DateTimeFromToRangeFilter
 
 
-class DateRangeFieldNew(RangeField):
+class DateRangeFieldNew(DateRangeField):
     """
     Поле как и DateFromToRangeFilter в django_filters только
     не переводить в datetime.datetime и стандартное решение работает
     с временем которое нам не нужно т.к аренда идет на сутки
     """
-    def __init__(self, *args, **kwargs):
-        fields = (
-            forms.DateField(),
-            forms.DateField())
-        super().__init__(fields, *args, **kwargs)
 
     def compress(self, data_list):
         if data_list:
@@ -22,8 +17,9 @@ class DateRangeFieldNew(RangeField):
         return None
 
 
-class CustomDateFromToRangeFilter(RangeFilter):
+class CustomDateFromToRangeFilter(DateTimeFromToRangeFilter):
     """
-    Кастомный фильтр для установеи нормальнього суфикса и простоты фильтрации
+    Кастомный фильтр для установления нормальнього суфикса и простоты фильтрации
     """
+
     field_class = DateRangeFieldNew

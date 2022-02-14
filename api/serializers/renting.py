@@ -1,4 +1,5 @@
 from rest_framework import serializers
+
 from flat.models import Renting
 
 
@@ -9,4 +10,4 @@ class RentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Renting
-        fields = ['flat', 'count_guest', 'lease_duration']
+        fields = ["flat", "count_guest", "lease_duration"]

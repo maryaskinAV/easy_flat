@@ -1,29 +1,26 @@
-from django.db import models
-from django.db.models import Avg
+import typing
 
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
-
 from django.core.exceptions import ValidationError
-from django.shortcuts import get_object_or_404
-
-from django.db.models.signals import post_save, post_delete
+from django.db import models
+from django.db.models import Avg
+from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
-
-import typing
-
-if not typing.TYPE_CHECKING:
-    from user.models import CustomUser
+from django.shortcuts import get_object_or_404
 
 
 class Rating(models.Model):
     """
     Создание рейтинга для привязанного объекта
     """
+
     object_id = models.PositiveIntegerField()
-    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, related_name='rating')
-    content_object = GenericForeignKey('content_type', 'object_id')
-    user = models.ForeignKey('user.CustomUser', on_delete=models.CASCADE, null=True)
+    content_type = models.ForeignKey(
+        ContentType, on_delete=models.CASCADE, related_name="rating"
+    )
+    content_object = GenericForeignKey("content_type", "object_id")
+    user = models.ForeignKey("user.CustomUser", on_delete=models.CASCADE, null=True)
 
     class RatingStar(models.IntegerChoices):
         One = 1
@@ -34,23 +31,32 @@ class Rating(models.Model):
 
     rating_star = models.IntegerField(choices=RatingStar.choices)
 
-    def save(self, *args, **kwargs):
+    def save(self, *args: typing.Any, **kwargs: typing.Any) -> None:
         self.clean()
         super().save(*args, **kwargs)
 
-    def clean(self):
+    def clean(self) -> None:
         model_name = ContentType.objects.get(id=self.content_type.id).model_class()
-        object_exist = get_object_or_404(model_name, pk=self.object_id)
+        get_object_or_404(model_name, pk=self.object_id)
         super().clean()
-        if Rating.objects.filter(content_type__pk=self.content_type.id,
-                                 object_id=self.object_id, user=self.user).exists() and self.id is None:
-            raise ValidationError('you have already taken a rating')
+        if (
+            Rating.objects.filter(
+                content_type__pk=self.content_type.id,
+                object_id=self.object_id,
+                user=self.user,
+            ).exists()
+            and self.id is None
+        ):
+            raise ValidationError("you have already taken a rating")
 
 
 @receiver(post_delete, sender=Rating)
 @receiver(post_save, sender=Rating)
-def update_avg_rating_for_parent(sender: Rating, instance: Rating, **kwargs):
-    model_name = ContentType.objects.get(id=instance.content_type.id).model_class()
-    model = model_name.objects.filter(pk=instance.object_id).annotate(rating_sum=Avg('rating__rating_star')).first()
-    model.avg_rating = model.rating_sum
-    model.save()
+def update_avg_rating_for_parent(
+    sender: Rating, instance: Rating, **kwargs: typing.Any
+) -> None:
+    avg_rating = sender.objects.filter(
+        content_type=instance.content_type, object_id=instance.object_id
+    ).aggregate(avg_rating=Avg("rating_star"))
+    instance.content_object.avg_rating = avg_rating["avg_rating"]
+    instance.content_object.save()
