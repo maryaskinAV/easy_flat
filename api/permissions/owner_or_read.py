@@ -13,11 +13,6 @@ class OwnerOrReadOnly(permissions.BasePermission):
     ) -> bool:
         is_safe_method = request.method in permissions.SAFE_METHODS
         if isinstance(obj, Flat):
-            #Возможность редактировать Flat только собственнику
-            return bool(request.method in permissions.SAFE_METHODS or request.user == obj.owner)
-        if isinstance(obj, Renting):
-            #Возможность редактировать Renting только собственнику
-            return bool(request.method in permissions.SAFE_METHODS or request.user == obj.user)
-        if isinstance(obj, Rating):
-            #Возможность редактировать Rating только собственнику
-            return bool(request.method in permissions.SAFE_METHODS or request.user == obj.user)
+            return is_safe_method or request.user == obj.owner
+        if isinstance(obj, (Renting, Rating)):
+            return is_safe_method or request.user == obj.user

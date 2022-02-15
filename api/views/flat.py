@@ -2,12 +2,15 @@ from django.utils.decorators import method_decorator
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
+
+
 from rest_framework.serializers import ModelSerializer
 from rest_framework.viewsets import ModelViewSet
 
 from api.filters import FlatFilter
 from api.permissions import OwnerOrReadOnly
 from api.serializers import FlatSerializer
+from api.mixins import CreateRatingMixin
 from flat.models import Flat
 
 tags = ["api/flat"]

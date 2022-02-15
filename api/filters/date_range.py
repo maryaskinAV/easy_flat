@@ -1,5 +1,3 @@
-import typing
-
 from django_filters.filters import DateRangeField, DateTimeFromToRangeFilter
 
 

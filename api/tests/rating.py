@@ -36,11 +36,14 @@ class RatingTestCase(ApiTestCase):
         self.authorize(self.quest)
         data = {
             "object_id": self.flat.id,
-            "content_type": ContentType.objects.get_for_model(self.flat).id,
+            "content_type": self.rating.content_type.id,
             "rating_star": Rating.RatingStar.Free,
         }
         response = self.client.post(url, data=data)
         self.assertEqual(response.status_code, 200)
+        self.assertIsNotNone(Rating.objects.get(object_id=self.flat.id,
+                                                content_type=self.rating.content_type.id,
+                                                rating_star=Rating.RatingStar.Free))
 
     def test_rating_patch(self) -> None:
         url = reverse("rating-detail", args=(self.rating.id,))

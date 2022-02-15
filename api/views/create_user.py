@@ -27,4 +27,3 @@ class CreateUserViewSet(GenericViewSet, CreateModelMixin):
         order: SignUpOrder = self.get_object()
         data = order.activate()
         return Response(data)
-
