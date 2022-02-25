@@ -1,3 +1,5 @@
+import typing
+
 from django.contrib.postgres.fields import DateRangeField
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -34,8 +36,6 @@ class Renting(models.Model):
         if is_booked:
             raise ValidationError("Квартира занята")
 
-    def save(
-        self, force_insert=False, force_update=False, using=None, update_fields=None
-    ) -> None:
+    def save(self, *args: typing.Any, **kwargs: typing.Any) -> None:
         self.clean()
         super().save()

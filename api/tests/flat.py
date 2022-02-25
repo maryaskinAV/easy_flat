@@ -1,11 +1,17 @@
+from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ValidationError
 from django.shortcuts import reverse
 
+from community.models import Rating
 from flat.models import Flat
 
 from . import ApiTestCase
 
 
 class FlatTestCase(ApiTestCase):
+    booked_days_after = "2012-12-1"
+    booked_days_before = "2012-12-12"
+
     def setUp(self) -> None:
         super().setUp()
 
@@ -42,12 +48,22 @@ class FlatTestCase(ApiTestCase):
             "total_area_min": 12,
             "total_area_max": 40,
             "max_guest_min": 12,
-            "max_guest_max": 40,
+            "max_guest_max": 15,
             "arena_timeline": "OneDay",
-            "booked_days": {"upper": "2012-12-1", "lower": "2012-12-2"},
+            "booked_days_after": self.booked_days_after,
+            "booked_days_before": self.booked_days_before,
+            "order_by": "-cost",
         }
         response = self.client.get(url, data=data)
         self.assertEqual(response.status_code, 200)
+
+    def test_flat_filter_with_incorrect_date(self) -> None:
+        url = reverse("flat-list")
+        data = {
+            "booked_days_after": self.booked_days_before,
+            "booked_days_before": self.booked_days_after,
+        }
+        self.assertRaises(ValidationError, self.client.get, path=url, data=data)
 
     def test_flat_patch(self) -> None:
         url = reverse("flat-detail", args=(self.flat.id,))
@@ -68,3 +84,28 @@ class FlatTestCase(ApiTestCase):
         response = self.client.delete(url)
         self.assertEqual(response.status_code, 204)
         self.assertFalse(Flat.objects.filter(id=self.flat.id).exists())
+
+    def test_flat_create_rating(self) -> None:
+        url = reverse("flat-create-rating", args=(self.flat.id,))
+        self.authorize(self.admin_user)
+        data = {"rating_star": Rating.RatingStar.Four}
+        response = self.client.post(url, data=data)
+        self.assertEqual(response.status_code, 200)
+
+    def test_flat_list_rating(self) -> None:
+        url = reverse("flat-list-rating", args=(self.flat.id,))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNotNone(response.data)
+
+    def test_flat_create_rating_with_already_exist(self) -> None:
+        Rating.objects.create(
+            object_id=self.flat.id,
+            rating_star=Rating.RatingStar.Two,
+            user=self.admin_user,
+            content_type=ContentType.objects.get_for_model(self.flat),
+        )
+        url = reverse("flat-create-rating", args=(self.flat.id,))
+        data = {"rating_star": Rating.RatingStar.Four}
+        self.authorize(self.admin_user)
+        self.assertRaises(ValidationError, self.client.post, path=url, data=data)

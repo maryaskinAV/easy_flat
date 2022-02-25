@@ -79,6 +79,7 @@ class PasswordChangeOrder(models.Model):
         Returns dict with token for REST authorization.
         """
         self.activated = True
+        self.save()
         user: CustomUser = self.user
         user.set_password(self.password)
         user.save()

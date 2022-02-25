@@ -3,6 +3,7 @@ from .create_user import CreateUserSerializers
 from .flat import FlatSerializer
 from .rating import RatingSerializer
 from .renting import RentSerializer
+from .user import CustomUserSerializer
 
 __all__ = [
     "PasswordChangeOrderSerializer",
@@ -10,4 +11,5 @@ __all__ = [
     "FlatSerializer",
     "RatingSerializer",
     "RentSerializer",
+    "CustomUserSerializer",
 ]

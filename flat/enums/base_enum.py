@@ -4,5 +4,5 @@ from enum import Enum
 
 class BaseEnum(Enum):
     @classmethod
-    def choices(cls) -> typing.Tuple[str, str]:
-        return ((x.name, x.value) for x in cls)
+    def choices(cls) -> typing.Generator[typing.Tuple[str, str], None, None]:
+        return ((x.value, x.name) for x in cls)

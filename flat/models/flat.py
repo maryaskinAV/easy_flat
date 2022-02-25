@@ -18,6 +18,6 @@ class Flat(models.Model):
     arena_timeline = models.CharField(choices=ArenaTimeLine.choices(), max_length=200)
     total_area = models.SmallIntegerField()
     date_publish = models.DateTimeField(auto_now=True)
-    avg_rating = models.FloatField(default=0)
+    avg_rating = models.FloatField(default=0, null=True)
 
     rating = GenericRelation("community.rating", null=True, blank=True)

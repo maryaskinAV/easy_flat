@@ -7,5 +7,6 @@ class ArenaTimeLine(BaseEnum):
     """
     Выбор краткосрочной или долгосрочной аренды
     """
-    OneDay = _('OneDay')
-    LongTime = _('LongTime')
+
+    OneDay = _("OneDay")
+    LongTime = _("LongTime")

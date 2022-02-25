@@ -19,9 +19,10 @@ from user.messages import (
     MESSAGE_TITLE,
     MESSAGE_TITLE_SUCCESS,
 )
-from user.models import CustomUser
 from user.service import create_token
 from user.tasks import send_create_user_code
+
+from .user import CustomUser
 
 
 class CreateUserManager(models.Manager):
@@ -45,7 +46,6 @@ class SignUpOrder(models.Model):
 
     def send(self) -> None:
         """Send email with activation url."""
-        self.clean()
         try:
             self.send_email()
             self.sent_at = now()
@@ -79,7 +79,6 @@ class SignUpOrder(models.Model):
         Токен действует не более 10 минут. При просроченном токене регистрация невозможна
         """
         if self.sent_at + timedelta(minutes=10) < now():
-            # вынести в messages тексты ошибок
             raise ValidationError("Your token was expired")
         if CustomUser.objects.filter(email=self.email).exists():
             raise ValidationError("Your email have already busy")

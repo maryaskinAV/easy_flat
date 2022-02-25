@@ -7,7 +7,7 @@ from django_filters import rest_framework as filter
 from django_filters.widgets import DateRangeWidget
 from psycopg2.extras import DateRange
 
-from flat.enums import ArenaTimeLine
+from flat.enums import ArenaTimeLine, OrderByFlat
 from flat.models import Flat
 
 from .date_range import CustomDateFromToRangeFilter
@@ -33,6 +33,9 @@ class FlatFilter(filter.FilterSet):
         widget=DateRangeWidget(attrs={"placeholder": "%Y-%m-%d"}),
         method="filter_booked_days",
     )
+    order_by = filter.ChoiceFilter(
+        choices=OrderByFlat.choices, method="filter_order_by"
+    )
 
     def filter_booked_days(
         self,
@@ -50,6 +53,16 @@ class FlatFilter(filter.FilterSet):
         if value[0] > value[1]:
             raise ValidationError("День снятия позже даты сдачи")
         queryset = queryset.exclude(rent__lease_duration__overlap=ranges)
+        return queryset
+
+    def filter_order_by(
+        self,
+        queryset: QuerySet,
+        name: typing.AnyStr,
+        value: typing.AnyStr,
+    ) -> QuerySet:
+        if value:
+            return queryset.order_by(value)
         return queryset
 
     class Meta:

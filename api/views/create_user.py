@@ -20,7 +20,7 @@ class CreateUserViewSet(GenericViewSet, CreateModelMixin):
     serializer_class = CreateUserSerializers
     lookup_field = "uuid"
 
-    @action(detail=True, methods=["POST"], url_path="activation")
+    @action(detail=True, methods=["POST"])
     def activation(
         self, request: Request, uuid: str, *args: typing.Any, **kwargs: typing.Any
     ) -> Response:

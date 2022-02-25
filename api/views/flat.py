@@ -2,15 +2,13 @@ from django.utils.decorators import method_decorator
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
-
-
 from rest_framework.serializers import ModelSerializer
 from rest_framework.viewsets import ModelViewSet
 
 from api.filters import FlatFilter
+from api.mixins import CreateRatingMixin, ListRatingMixin
 from api.permissions import OwnerOrReadOnly
 from api.serializers import FlatSerializer
-from api.mixins import CreateRatingMixin
 from flat.models import Flat
 
 tags = ["api/flat"]
@@ -74,29 +72,13 @@ tags = ["api/flat"]
     ),
     name="destroy",
 )
-class FlatViewSet(ModelViewSet):
+class FlatViewSet(CreateRatingMixin, ListRatingMixin, ModelViewSet):
     queryset = Flat.objects.all()
     serializer_class = FlatSerializer
     permission_classes = [OwnerOrReadOnly]
     filter_backends = (DjangoFilterBackend,)
     filterset_class = FlatFilter
+    lookup_field = "pk"
 
     def perform_create(self, serializer: ModelSerializer) -> None:
         serializer.save(owner=self.request.user)
-
-
-"""
-class GetRatingsMixin:
-    @method_decorator(swagger_auto_schema(operation_id='Create rating',
-                                          tags=tags,
-                                          operation_description='',
-                                          responses={}), name='Create rating')
-    @action(detail=False, methods=['GET'], url_path='get_ratings')
-    def get_ratings(self, request, *args, **kwargs):
-        instance = self.get_object()
-        # todo сделать миксины для каждой старшей модели
-        ratings = instance.rating.all()
-        data = Rating.objects.filter(object_id=object_id, content_type=model_name)
-        serializers = self.get_serializer(data, many=True)
-        return Response(serializers.data)
-"""

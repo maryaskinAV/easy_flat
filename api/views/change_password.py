@@ -12,7 +12,7 @@ from api.serializers import PasswordChangeOrderSerializer
 from user.models import PasswordChangeOrder
 
 
-class PasswordChangeOrderViewSet(GenericViewSet, CreateModelMixin):
+class PasswordChangeOrderViewSet(CreateModelMixin, GenericViewSet):
     """
     ViewSet для заявки на смену пароля. Для активации создан отдельный метод activation.
     При создани модели пользователь является отправителем заявки при помощи переопределения
@@ -26,7 +26,7 @@ class PasswordChangeOrderViewSet(GenericViewSet, CreateModelMixin):
     def perform_create(self, serializer: ModelSerializer) -> None:
         serializer.save(user=self.request.user)
 
-    @action(detail=True, methods=["POST"], url_path="activation")
+    @action(detail=True, methods=["POST"])
     def activation(
         self, request: Request, uuid: str, *args: typing.Any, **kwargs: typing.Any
     ) -> Response:

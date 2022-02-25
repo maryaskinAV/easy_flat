@@ -21,7 +21,7 @@ env = environ.Env()
 environ.Env.read_env(env_file=env_file)
 
 
-def get_env_value(name: str, default: any = None) -> typing.Any:
+def get_env_value(name: str, default: any = None) -> typing.Union[typing.Any, str]:
     return env(name, default=None) or os.environ.get(name) or default
 
 
