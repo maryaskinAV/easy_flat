@@ -26,7 +26,6 @@ def get_env_value(name: str, default: any = None) -> typing.Union[typing.Any, st
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-AUTH_USER_MODEL = "user.CustomUser"
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
@@ -88,7 +87,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "easy_flat.wsgi.application"
+WSGI_APPLICATION = "_project.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
@@ -129,4 +128,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = "/static/"
+
+AUTH_USER_MODEL = "user.CustomUser"
+
 FRONTEND_URL = "http://127.0.0.1:8000/"

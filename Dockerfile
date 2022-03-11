@@ -1,19 +1,43 @@
-from ubuntu:20.04
-RUN apt-get update -y
-RUN apt-get install software-properties-common -y
-RUN add-apt-repository ppa:deadsnakes/ppa -y
+FROM        python:3.8.12-slim
 
-RUN apt install python3.8 python3-pip libpq-dev python3-dev -y
-WORKDIR /easy_flat
-COPY ./requirements.txt ./requirements.txt
-RUN pip install --upgrade -r requirements.txt
-ENV HOME=/home/app
-ENV APP_HOME=/home/easy_flat/
-RUN mkdir $APP_HOME
-RUN mkdir $APP_HOME/staticfiles
-WORKDIR $APP_HOME
-COPY ./entrypoint.sh .
-RUN sed -i 's/\r$//g' entrypoint.sh
-RUN chmod +x entrypoint.sh
+ENV         LANG C.UTF-8
+ENV         USER app
+ENV         PROJECTPATH=/home/app/
 
-COPY . .
+ENV         PYTHONFAULTHANDLER=1 \
+            PYTHONHASHSEED=random \
+            PYTHONUNBUFFERED=1
+
+WORKDIR     ${PROJECTPATH}
+
+RUN         set -x \
+            && apt-get -qq update \
+            && apt-get install -y --no-install-recommends \
+               build-essential libpq-dev git gettext binutils curl \
+            && apt-get purge -y --auto-remove \
+            && rm -rf /var/lib/apt/lists/*
+
+ADD         https://github.com/ufoscout/docker-compose-wait/releases/download/2.7.3/wait ${PROJECTPATH}/wait
+RUN         chmod +x ${PROJECTPATH}/wait
+
+RUN         pip install --upgrade pip \
+            && pip install -U pytest celery
+
+RUN         useradd -m -d /home/${USER} ${USER} \
+            && mkdir -p /home/${USER}/logs/ \
+            && chown -R ${USER} /home/${USER}
+
+RUN         pip3 install poetry
+
+COPY        pyproject.toml ${PROJECTPATH}/
+
+RUN         poetry config virtualenvs.create false
+
+RUN         poetry install --no-dev
+RUN         poetry add platformdirs
+
+COPY        . ${PROJECTPATH}
+
+USER         ${user}
+
+EXPOSE      8000
